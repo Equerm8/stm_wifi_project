@@ -1,0 +1,13 @@
+1. Create simple program which displays something on display on stm32-L4
+2. Implement sensors on stm32-G017 in order:
+	a) DHT11
+	b) + BMP280
+	c) + BH1750
+3. Implement buzzer with conditions
+4. Implement WiFi module
+5. Make visulaisation and send info through wifi
+
+Design must include:
+1. Parallel processing
+2. Schematic in KiCad
+3. No user inputs

@@ -1,0 +1,8 @@
+4inch TFT Touch Shield 320x480 Pixel XPT2046 Touch Controller
+NUCLEO-L476RG NUL476RG$AU1 (display)
+NUCLEO-G071RB NUG071RB$AU2
+Light sensor BH1750
+Temperature and humidity sensor DHT11
+Digital barometer, pressure sensor BMP280
+2 WiFi modules ESP8266 + NodeMCU v3
+Buzzer
