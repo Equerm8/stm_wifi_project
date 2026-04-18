@@ -1,0 +1,1 @@
+DHT11 implementation: https://controllerstech.com/using-dht11-sensor-with-stm32/

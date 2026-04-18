@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
@@ -28,12 +29,25 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+typedef enum {
+	DHT_IDLE,
+	DHT_RESPONSE_WAIT,
+	DHT_START_LOW,
+	DHT_START_HIGH,
+	DHT_READ_DATA
+} dht_state_t;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 #define UART_TIMEOUT 10
+#define MS_PER_SEC 1000
+#define ONE_SEC (1 * MS_PER_SEC)
+#define TWO_SEC (2 * MS_PER_SEC)
+#define DHT_RESPONSE_TIME 18 // ms
+#define DHT_LOW_TIME 40
+#define DHT_HIGH_TIME 80
+#define DHT_WAIT_BEFORE_READ_TIME 40
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -44,14 +58,25 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-volatile uint32_t ticks;
+
+volatile uint32_t led_ticks;
+volatile uint32_t dht_ticks;
 volatile bool is_usr_btn_pressed;
 uint8_t btn_pressed_msg[]="Button pressed!";
+dht_state_t dht_timer = 0;
+uint8_t current_state = DHT_IDLE;
+uint16_t dht_us;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
+
+void process_DHT11(void);
+void DHT11_Start (void);
+uint8_t Check_Response (void);
+uint8_t DHT11_Read (void);
 
 /* USER CODE END PFP */
 
@@ -90,10 +115,13 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART2_UART_Init();
+  MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
 
   // time-based funcs
+
   SysTick_Config(SystemCoreClock / 1000);
+
 
 
   /* USER CODE END 2 */
@@ -105,10 +133,10 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  if (ticks >= 500)
+	  if (led_ticks >= 500)
 	  {
 		  HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
-		  ticks=0;
+		  led_ticks=0;
 	  }
 
 
@@ -117,6 +145,7 @@ int main(void)
 		  HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
 		  is_usr_btn_pressed = false;
 		  HAL_UART_Transmit(&huart2, btn_pressed_msg, sizeof(btn_pressed_msg)-1, UART_TIMEOUT);
+
 	  }
 
 
@@ -172,6 +201,111 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin)
 		is_usr_btn_pressed = true;
 	}
 }
+
+// DHT funcs
+void process_DHT11(void)
+{
+	switch(current_state)
+	{
+		case DHT_IDLE:
+			if (dht_timer >= TWO_SEC)
+			{
+				DHT11_Start();
+				dht_timer = dht_ticks;
+				current_state = DHT_START_LOW;
+			}
+			break;
+
+		case DHT_RESPONSE_WAIT:
+			if (dht_ticks - dht_timer >= DHT_RESPONSE_TIME)
+			{
+				Set_Pin_Input(DHT_control_GPIO_Port, DHT_control_Pin);
+				HAL_TIM_Base_Start(&htim6);
+				dht_timer = 0;
+				current_state = DHT_START_LOW;
+			}
+			break;
+
+		case DHT_START_LOW:
+			dht_us = __HAL_TIM_GET_COUNTER(&htim6);
+			if (dht_us >= DHT_LOW_TIME)
+			{
+				if (HAL_GPIO_ReadPin(DHT_control_GPIO_Port, DHT_control_Pin) == 0)
+				{
+					current_state = DHT_START_LOW;
+					__HAL_TIM_SET_COUNTER(&htim6, 0);
+				}
+			}
+			break;
+
+		case DHT_START_HIGH:
+			dht_us = __HAL_TIM_GET_COUNTER(&htim6);
+			if (dht_us >= DHT_HIGH_TIME)
+			{
+				if (HAL_GPIO_ReadPin(DHT_control_GPIO_Port, DHT_control_Pin) == 1)
+				{
+					current_state = DHT_READ_DATA;
+					__HAL_TIM_SET_COUNTER(&htim6, 0);
+				}
+			}
+			break;
+
+		case DHT_READ_DATA:
+
+			if (HAL_GPIO_ReadPin(DHT_control_GPIO_Port, DHT_control_Pin) == 1)
+			{
+				dht_us = __HAL_TIM_GET_COUNTER(&htim6);
+				if (dht_us >= DHT_WAIT_BEFORE_READ_TIME)
+				{
+
+				}
+			}
+
+			break;
+	}
+}
+
+void DHT11_Start (void)
+{
+	Set_Pin_Output(DHT_control_GPIO_Port, DHT_control_Pin);
+	HAL_GPIO_WritePin(DHT_control_GPIO_Port, DHT_control_Pin, 0);
+}
+
+uint8_t DHT11_Read (void) // TODO PRZEROBIC ABY NIE BLOKOWALO PRGORAMU
+{
+	uint8_t i,j;
+	for (j=0;j<8;j++)
+	{
+		while (!(HAL_GPIO_ReadPin (DHT11_PORT, DHT11_PIN)));   // wait for the pin to go high
+		delay (40);   // wait for 40 us
+		if (!(HAL_GPIO_ReadPin (DHT11_PORT, DHT11_PIN)))   // if the pin is low
+		{
+			i&= ~(1<<(7-j));   // write 0
+		}
+		else i|= (1<<(7-j));  // if the pin is high, write 1
+		while ((HAL_GPIO_ReadPin (DHT11_PORT, DHT11_PIN)));  // wait for the pin to go low
+	}
+	return i;
+}
+
+void Set_Pin_Output (GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin)
+{
+	GPIO_InitTypeDef GPIO_InitStruct = {0};
+	GPIO_InitStruct.Pin = GPIO_Pin;
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+	HAL_GPIO_Init(GPIOx, &GPIO_InitStruct);
+}
+
+void Set_Pin_Input (GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin)
+{
+	GPIO_InitTypeDef GPIO_InitStruct = {0};
+	GPIO_InitStruct.Pin = GPIO_Pin;
+	GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	HAL_GPIO_Init(GPIOx, &GPIO_InitStruct);
+}
+
 /* USER CODE END 4 */
 
 /**
