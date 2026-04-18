@@ -20,11 +20,10 @@
 #include "main.h"
 #include "usart.h"
 #include "gpio.h"
-#include <stdbool.h>
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <stdbool.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -34,7 +33,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+#define UART_TIMEOUT 10
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -47,6 +46,7 @@
 /* USER CODE BEGIN PV */
 volatile uint32_t ticks;
 volatile bool is_usr_btn_pressed;
+uint8_t btn_pressed_msg[]="Button pressed!";
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -110,11 +110,16 @@ int main(void)
 		  HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
 		  ticks=0;
 	  }
+
+
 	  if (is_usr_btn_pressed)
 	  {
 		  HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
 		  is_usr_btn_pressed = false;
+		  HAL_UART_Transmit(&huart2, btn_pressed_msg, sizeof(btn_pressed_msg)-1, UART_TIMEOUT);
 	  }
+
+
   }
   /* USER CODE END 3 */
 }
