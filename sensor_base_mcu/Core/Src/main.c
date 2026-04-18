@@ -20,6 +20,7 @@
 #include "main.h"
 #include "usart.h"
 #include "gpio.h"
+#include <stdbool.h>
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -45,6 +46,7 @@
 
 /* USER CODE BEGIN PV */
 volatile uint32_t ticks;
+volatile bool is_usr_btn_pressed;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -91,7 +93,9 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   // time-based funcs
-  SysTick_Config(16000000 / 1000);
+  SysTick_Config(SystemCoreClock / 1000);
+
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -105,6 +109,11 @@ int main(void)
 	  {
 		  HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
 		  ticks=0;
+	  }
+	  if (is_usr_btn_pressed)
+	  {
+		  HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
+		  is_usr_btn_pressed = false;
 	  }
   }
   /* USER CODE END 3 */
@@ -151,7 +160,13 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-
+void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin)
+{
+	if (GPIO_Pin == USR_BTN_Pin)
+	{
+		is_usr_btn_pressed = true;
+	}
+}
 /* USER CODE END 4 */
 
 /**
