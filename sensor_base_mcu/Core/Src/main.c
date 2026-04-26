@@ -18,12 +18,15 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdbool.h>
+#include <stdio.h>
+#include "dht11.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -33,7 +36,8 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define UART_TIMEOUT 10
+
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -44,14 +48,18 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-volatile uint32_t ticks;
+
+volatile uint32_t led_ticks;
 volatile bool is_usr_btn_pressed;
 uint8_t btn_pressed_msg[]="Button pressed!";
+DHT11_t DHT11 = {.GPIOx = DHT_control_GPIO_Port, .GPIO_Pin = DHT_control_Pin, .htim = &htim6};
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
+void delay (uint16_t time);
 
 /* USER CODE END PFP */
 
@@ -90,39 +98,71 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART2_UART_Init();
+  MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
 
   // time-based funcs
+
   SysTick_Config(SystemCoreClock / 1000);
+
+
 
 
   /* USER CODE END 2 */
 
+
+
+
+
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)
-  {
+    while (1)
+    {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  if (ticks >= 500)
-	  {
-		  HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
-		  ticks=0;
-	  }
+        DHT11_Process(&DHT11);
 
 
-	  if (is_usr_btn_pressed)
-	  {
-		  HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
-		  is_usr_btn_pressed = false;
-		  HAL_UART_Transmit(&huart2, btn_pressed_msg, sizeof(btn_pressed_msg)-1, UART_TIMEOUT);
-	  }
 
 
+
+
+
+
+
+
+
+        if (DHT11.state == DHT_STATE_START)
+        {
+            char msg[64];
+            int len = sprintf(msg, "Humidity: %d%%, Temp: %d C\r\n", DHT11.humidity, DHT11.temperature);
+            HAL_UART_Transmit(&huart2, (uint8_t*)msg, len, 100);
+            led_ticks = 0; // Użyj jakiegoś licznika, żeby nie spamować UART-a co milisekundę
+        }
+
+        // blink
+        if (led_ticks >= 2000)
+        {
+          HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
+          led_ticks=0;
+        }
+
+        if (is_usr_btn_pressed)
+        {
+          HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
+          is_usr_btn_pressed = false;
+
+        }
   }
   /* USER CODE END 3 */
 }
+
+
+
+
+
+
 
 /**
   * @brief System Clock Configuration
@@ -172,6 +212,16 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin)
 		is_usr_btn_pressed = true;
 	}
 }
+void delay (uint16_t time)
+{
+	/* change your code here for the delay in microseconds */
+	__HAL_TIM_ENABLE(&htim6);
+	__HAL_TIM_SET_COUNTER(&htim6, 0);
+	while ((__HAL_TIM_GET_COUNTER(&htim6))<time);
+	__HAL_TIM_DISABLE(&htim6);
+}
+
+
 /* USER CODE END 4 */
 
 /**

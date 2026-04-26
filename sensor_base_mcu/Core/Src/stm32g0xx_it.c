@@ -57,7 +57,8 @@
 /* External variables --------------------------------------------------------*/
 
 /* USER CODE BEGIN EV */
-extern volatile uint32_t ticks;
+extern volatile uint32_t led_ticks;
+extern volatile uint32_t dht_ticks;
 /* USER CODE END EV */
 
 /******************************************************************************/
@@ -129,7 +130,7 @@ void SysTick_Handler(void)
   /* USER CODE END SysTick_IRQn 0 */
   HAL_IncTick();
   /* USER CODE BEGIN SysTick_IRQn 1 */
-  ticks++;
+  led_ticks++;
   /* USER CODE END SysTick_IRQn 1 */
 }
 
