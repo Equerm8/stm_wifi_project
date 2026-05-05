@@ -628,11 +628,11 @@ int main(void)
   SysTick_Config(80000000 / 100000); // 0.01 ms
  800066c:	f44f 7048 	mov.w	r0, #800	@ 0x320
  8000670:	f7ff ffd0 	bl	8000614 <SysTick_Config>
-  /* USER CODE BEGIN WHILE */
   while (1)
   {
     /* USER CODE END WHILE */
-	  /* USER CODE BEGIN 3 */
+
+    /* USER CODE BEGIN 3 */
 	  if (ticks >= 100000)
  8000674:	4b06      	ldr	r3, [pc, #24]	@ (8000690 <main+0x38>)
  8000676:	681b      	ldr	r3, [r3, #0]
