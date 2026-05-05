@@ -1,0 +1,12 @@
+../User/LCD/LCD_Touch.c:29:17:TP_Read_ADC	1
+../User/LCD/LCD_Touch.c:64:17:TP_Read_ADC_Average	6
+../User/LCD/LCD_Touch.c:104:13:TP_Read_ADC_XY	1
+../User/LCD/LCD_Touch.c:119:13:TP_Read_TwiceADC	9
+../User/LCD/LCD_Touch.c:151:16:TP_Scan	9
+../User/LCD/LCD_Touch.c:215:13:TP_DrawCross	1
+../User/LCD/LCD_Touch.c:236:13:TP_ShowInfo	1
+../User/LCD/LCD_Touch.c:280:6:TP_Adjust	17
+../User/LCD/LCD_Touch.c:544:6:TP_GetAdFac	5
+../User/LCD/LCD_Touch.c:578:6:TP_Dialog	2
+../User/LCD/LCD_Touch.c:624:6:TP_DrawBoard	55
+../User/LCD/LCD_Touch.c:718:6:TP_Init	1
