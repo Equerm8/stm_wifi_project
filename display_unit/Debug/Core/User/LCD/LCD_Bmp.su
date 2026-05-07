@@ -1,2 +1,0 @@
-../Core/User/LCD/LCD_Bmp.c:26:6:SD_Init	16	static
-../Core/User/LCD/LCD_Bmp.c:53:6:LCD_Show_bmp	80	static

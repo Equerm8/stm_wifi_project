@@ -19,12 +19,17 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "spi.h"
+#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <stdio.h>
+#include "DEV_Config.h"
+#include "LCD_Driver.h"
+#include "LCD_GUI.h"
+#include "fonts.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -46,6 +51,18 @@
 
 /* USER CODE BEGIN PV */
 volatile uint32_t ticks;
+uint16_t y_pos = 0;
+char wifi_connectrion_str[] = "WiFi connection:";
+char temperature_str[] = "Temperature:";
+char humidity_str[] = "Humidity:";
+char light_sensor_str[] = "Light intensity:";
+char pressure_str[] = "Pressure:";
+
+// operational vars
+
+
+
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -90,26 +107,44 @@ int main(void)
   MX_GPIO_Init();
   MX_USART2_UART_Init();
   MX_SPI1_Init();
+  MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
+    System_Init();
 
-  // time-related
-  SysTick_Config(80000000 / 100000); // 0.01 ms
+    LCD_SCAN_DIR Lcd_ScanDir = SCAN_DIR_DFT;//SCAN_DIR_DFT = D2U_L2R
+    HAL_GPIO_WritePin(LCD_BL_GPIO_Port, LCD_BL_Pin, GPIO_PIN_SET);
+    LCD_Init(Lcd_ScanDir, 800);
+
+    GUI_Show();
+    Driver_Delay_ms(5000);
+
+    // time-related
+    SysTick_Config(80000000 / 100000); // 0.01 ms
+    LCD_Clear(WHITE);
+
+    // gui init
+    GUI_DisString_EN(0, y_pos, wifi_connectrion_str, &Font24, WHITE, BLACK);
+    y_pos += 24;
+    GUI_DisString_EN(0, y_pos, temperature_str, &Font24, WHITE, BLACK);
+    y_pos += 24;
+    GUI_DisString_EN(0, y_pos, humidity_str, &Font24, WHITE, BLACK);
+    y_pos += 24;
+    GUI_DisString_EN(0, y_pos, pressure_str, &Font24, WHITE, BLACK);
+    y_pos += 24;
+    GUI_DisString_EN(0, y_pos, light_sensor_str, &Font24, WHITE, BLACK);
+    y_pos += 24;
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)
-  {
+    while (1)
+    {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  if (ticks >= 100000)
-	  {
-		  HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
-		  ticks = 0;
-	  }
-  }
+
+    }
   /* USER CODE END 3 */
 }
 

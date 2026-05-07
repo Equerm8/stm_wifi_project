@@ -26,10 +26,17 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_pwr_ex.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_spi.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_spi_ex.h \
+ ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_tim.h \
+ ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_tim_ex.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart_ex.h \
- ../Core/Inc/spi.h ../Core/Inc/main.h ../Core/Inc/usart.h \
- ../Core/Inc/gpio.h
+ ../Core/Inc/spi.h ../Core/Inc/main.h ../Core/Inc/tim.h \
+ ../Core/Inc/usart.h ../Core/Inc/gpio.h \
+ C:/Users/Equer/OneDrive/PWr/Semester\ 1/Microcontroller\ programming/Project/stm_wifi_project/display_unit/User/Config/DEV_Config.h \
+ C:/Users/Equer/OneDrive/PWr/Semester\ 1/Microcontroller\ programming/Project/stm_wifi_project/display_unit/User/LCD/LCD_Driver.h \
+ C:/Users/Equer/OneDrive/PWr/Semester\ 1/Microcontroller\ programming/Project/stm_wifi_project/display_unit/User/LCD/LCD_GUI.h \
+ C:/Users/Equer/OneDrive/PWr/Semester\ 1/Microcontroller\ programming/Project/stm_wifi_project/display_unit/User/LCD/LCD_Driver.h \
+ C:/Users/Equer/OneDrive/PWr/Semester\ 1/Microcontroller\ programming/Project/stm_wifi_project/display_unit/User/Fonts/fonts.h
 ../Core/Inc/main.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal.h:
 ../Core/Inc/stm32l4xx_hal_conf.h:
@@ -58,9 +65,17 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_pwr_ex.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_spi.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_spi_ex.h:
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_tim.h:
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_tim_ex.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart_ex.h:
 ../Core/Inc/spi.h:
 ../Core/Inc/main.h:
+../Core/Inc/tim.h:
 ../Core/Inc/usart.h:
 ../Core/Inc/gpio.h:
+C:/Users/Equer/OneDrive/PWr/Semester\ 1/Microcontroller\ programming/Project/stm_wifi_project/display_unit/User/Config/DEV_Config.h:
+C:/Users/Equer/OneDrive/PWr/Semester\ 1/Microcontroller\ programming/Project/stm_wifi_project/display_unit/User/LCD/LCD_Driver.h:
+C:/Users/Equer/OneDrive/PWr/Semester\ 1/Microcontroller\ programming/Project/stm_wifi_project/display_unit/User/LCD/LCD_GUI.h:
+C:/Users/Equer/OneDrive/PWr/Semester\ 1/Microcontroller\ programming/Project/stm_wifi_project/display_unit/User/LCD/LCD_Driver.h:
+C:/Users/Equer/OneDrive/PWr/Semester\ 1/Microcontroller\ programming/Project/stm_wifi_project/display_unit/User/Fonts/fonts.h:

@@ -1,0 +1,14 @@
+../User/LCD/LCD_GUI.c:25:6:GUI_Swop	24	static
+../User/LCD/LCD_GUI.c:36:6:GUI_Clear	16	static
+../User/LCD/LCD_GUI.c:49:6:GUI_DrawPoint	32	static
+../User/LCD/LCD_GUI.c:82:6:GUI_DrawLine	64	static
+../User/LCD/LCD_GUI.c:142:6:GUI_DrawRectangle	40	static
+../User/LCD/LCD_GUI.c:184:6:GUI_DrawCircle	40	static
+../User/LCD/LCD_GUI.c:253:6:GUI_DisChar	48	static
+../User/LCD/LCD_GUI.c:299:6:GUI_DisString_EN	40	static
+../User/LCD/LCD_GUI.c:343:6:GUI_DisNum	560	static
+../User/LCD/LCD_GUI.c:387:6:GUI_Disbitmap	40	static
+../User/LCD/LCD_GUI.c:412:6:GUI_DisGrayMap	40	static
+../User/LCD/LCD_GUI.c:436:8:GUI_GetFontSize	24	static
+../User/LCD/LCD_GUI.c:469:6:GUI_Showtime	56	static
+../User/LCD/LCD_GUI.c:532:6:GUI_Show	80	static

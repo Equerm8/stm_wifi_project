@@ -1,0 +1,14 @@
+../User/LCD/LCD_Driver.c:27:13:LCD_Reset	1
+../User/LCD/LCD_Driver.c:37:13:LCD_SetBackLight	1
+../User/LCD/LCD_Driver.c:45:6:LCD_WriteReg	1
+../User/LCD/LCD_Driver.c:53:6:LCD_WriteData	1
+../User/LCD/LCD_Driver.c:66:13:LCD_Write_AllData	2
+../User/LCD/LCD_Driver.c:82:13:LCD_InitReg	1
+../User/LCD/LCD_Driver.c:195:6:LCD_SetGramScanWay	13
+../User/LCD/LCD_Driver.c:261:6:LCD_Init	2
+../User/LCD/LCD_Driver.c:293:6:LCD_SetWindow	1
+../User/LCD/LCD_Driver.c:317:6:LCD_SetCursor	1
+../User/LCD/LCD_Driver.c:328:6:LCD_SetColor	1
+../User/LCD/LCD_Driver.c:340:6:LCD_SetPointlColor	3
+../User/LCD/LCD_Driver.c:357:6:LCD_SetArealColor	3
+../User/LCD/LCD_Driver.c:369:6:LCD_Clear	1

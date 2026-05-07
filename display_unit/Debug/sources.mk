@@ -24,11 +24,8 @@ C_DEPS :=
 SUBDIRS := \
 Core/Src \
 Core/Startup \
-Core/User/Config \
-Core/User/FATFS \
-Core/User/Fonts \
-Core/User/LCD \
-Core/User/SDCard \
 Drivers/STM32L4xx_HAL_Driver/Src \
-Core/User/FATFS/option \
+User/Config \
+User/Fonts \
+User/LCD \
 
