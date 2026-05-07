@@ -36,7 +36,8 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  C:/Users/Equer/OneDrive/PWr/Semester\ 1/Microcontroller\ programming/Project/stm_wifi_project/display_unit/User/LCD/LCD_Driver.h \
  C:/Users/Equer/OneDrive/PWr/Semester\ 1/Microcontroller\ programming/Project/stm_wifi_project/display_unit/User/LCD/LCD_GUI.h \
  C:/Users/Equer/OneDrive/PWr/Semester\ 1/Microcontroller\ programming/Project/stm_wifi_project/display_unit/User/LCD/LCD_Driver.h \
- C:/Users/Equer/OneDrive/PWr/Semester\ 1/Microcontroller\ programming/Project/stm_wifi_project/display_unit/User/Fonts/fonts.h
+ C:/Users/Equer/OneDrive/PWr/Semester\ 1/Microcontroller\ programming/Project/stm_wifi_project/display_unit/User/Fonts/fonts.h \
+ ../Core/Inc/operational_variables.h
 ../Core/Inc/main.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal.h:
 ../Core/Inc/stm32l4xx_hal_conf.h:
@@ -79,3 +80,4 @@ C:/Users/Equer/OneDrive/PWr/Semester\ 1/Microcontroller\ programming/Project/stm
 C:/Users/Equer/OneDrive/PWr/Semester\ 1/Microcontroller\ programming/Project/stm_wifi_project/display_unit/User/LCD/LCD_GUI.h:
 C:/Users/Equer/OneDrive/PWr/Semester\ 1/Microcontroller\ programming/Project/stm_wifi_project/display_unit/User/LCD/LCD_Driver.h:
 C:/Users/Equer/OneDrive/PWr/Semester\ 1/Microcontroller\ programming/Project/stm_wifi_project/display_unit/User/Fonts/fonts.h:
+../Core/Inc/operational_variables.h:

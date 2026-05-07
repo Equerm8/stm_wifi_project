@@ -64,7 +64,7 @@ main-build: display_unit.elf secondary-outputs
 
 # Tool invocations
 display_unit.elf display_unit.map: $(OBJS) $(USER_OBJS) C:\Users\Equer\OneDrive\PWr\Semester\ 1\Microcontroller\ programming\Project\stm_wifi_project\display_unit\STM32L476RGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "display_unit.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\Equer\OneDrive\PWr\Semester 1\Microcontroller programming\Project\stm_wifi_project\display_unit\STM32L476RGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="display_unit.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+	arm-none-eabi-gcc -o "display_unit.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\Equer\OneDrive\PWr\Semester 1\Microcontroller programming\Project\stm_wifi_project\display_unit\STM32L476RGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="display_unit.map" -Wl,--gc-sections -static  -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
