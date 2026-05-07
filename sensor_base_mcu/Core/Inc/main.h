@@ -74,6 +74,8 @@ void Error_Handler(void);
 #define TMS_GPIO_Port GPIOA
 #define TCK_Pin GPIO_PIN_14
 #define TCK_GPIO_Port GPIOA
+#define BH_addr_Pin GPIO_PIN_5
+#define BH_addr_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 
