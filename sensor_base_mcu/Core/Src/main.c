@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "i2c.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
@@ -27,6 +28,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include "dht11.h"
+#include "bh1750.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -53,6 +55,7 @@ volatile uint32_t led_ticks;
 volatile bool is_usr_btn_pressed;
 uint8_t btn_pressed_msg[]="Button pressed!";
 DHT11_t DHT11 = {.GPIOx = DHT_control_GPIO_Port, .GPIO_Pin = DHT_control_Pin, .htim = &htim6};
+float light_intensity;
 
 /* USER CODE END PV */
 
@@ -99,20 +102,16 @@ int main(void)
   MX_GPIO_Init();
   MX_USART2_UART_Init();
   MX_TIM6_Init();
+  MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
 
-  // time-based funcs
-
   SysTick_Config(SystemCoreClock / 1000);
-
+  BH1750_Init(&hi2c1);
+  BH1750_SetMode(CONTINUOUS_HIGH_RES_MODE);
 
 
 
   /* USER CODE END 2 */
-
-
-
-
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
@@ -123,27 +122,31 @@ int main(void)
     /* USER CODE BEGIN 3 */
         DHT11_Process(&DHT11);
 
-
-
-
-
-
-
-
-
-
-
         if (DHT11.state == DHT_STATE_START)
         {
             char msg[64];
             int len = sprintf(msg, "Humidity: %d%%, Temp: %d C\r\n", DHT11.humidity, DHT11.temperature);
             HAL_UART_Transmit(&huart2, (uint8_t*)msg, len, 100);
-            led_ticks = 0; // Użyj jakiegoś licznika, żeby nie spamować UART-a co milisekundę
+            led_ticks = 0;
         }
 
         // blink
         if (led_ticks >= 2000)
         {
+
+          BH1750_STATUS status = BH1750_ReadLight(&light_intensity);
+          if (status == BH1750_OK)
+          {
+            char msg[64];
+            int len = sprintf(msg, "Light intensity: %d", (int)light_intensity);
+            HAL_UART_Transmit(&huart2, (uint8_t*)msg, len, 100);
+          }
+          else
+          {
+              HAL_UART_Transmit(&huart2, (uint8_t*)"BH1750 Error!\r\n", 15, 100);
+          }
+
+
           HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
           led_ticks=0;
         }
@@ -157,12 +160,6 @@ int main(void)
   }
   /* USER CODE END 3 */
 }
-
-
-
-
-
-
 
 /**
   * @brief System Clock Configuration
