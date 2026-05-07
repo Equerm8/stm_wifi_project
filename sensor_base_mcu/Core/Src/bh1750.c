@@ -19,6 +19,7 @@
 I2C_HandleTypeDef 	*bh1750_i2c;	// Handler to I2C interface
 bh1750_mode 		Bh1750_Mode;	// Current sensor mode
 uint8_t 			Bh1750_Mtreg;	// Current MT register value
+uint8_t BH1750_CurrentAddress = (0x23 << 1); // Domyślny startowy
 
 //
 //	Initialization.
@@ -40,7 +41,7 @@ BH1750_STATUS BH1750_Init(I2C_HandleTypeDef *hi2c)
 BH1750_STATUS BH1750_Reset(void)
 {
 	uint8_t tmp = 0x07;
-	if(HAL_OK == HAL_I2C_Master_Transmit(bh1750_i2c, BH1750_ADDRESS, &tmp, 1, 10))
+	if(HAL_OK == HAL_I2C_Master_Transmit(bh1750_i2c, BH1750_CurrentAddress, &tmp, 1, 10))
 		return BH1750_OK;
 
 	return BH1750_ERROR;
@@ -54,7 +55,7 @@ BH1750_STATUS BH1750_Reset(void)
 BH1750_STATUS BH1750_PowerState(uint8_t PowerOn)
 {
 	PowerOn = (PowerOn? 1:0);
-	if(HAL_OK == HAL_I2C_Master_Transmit(bh1750_i2c, BH1750_ADDRESS, &PowerOn, 1, 10))
+	if(HAL_OK == HAL_I2C_Master_Transmit(bh1750_i2c, BH1750_CurrentAddress, &PowerOn, 1, 10))
 		return BH1750_OK;
 
 	return BH1750_ERROR;
@@ -69,7 +70,7 @@ BH1750_STATUS BH1750_SetMode(bh1750_mode Mode)
 	if((Mode & 0x0F) > 3) return BH1750_ERROR;
 
 	Bh1750_Mode = Mode;
-	if(HAL_OK == HAL_I2C_Master_Transmit(bh1750_i2c, BH1750_ADDRESS, &Mode, 1, 10))
+	if(HAL_OK == HAL_I2C_Master_Transmit(bh1750_i2c, BH1750_CurrentAddress, &Mode, 1, 10))
 		return BH1750_OK;
 
 	return BH1750_ERROR;
@@ -92,12 +93,12 @@ BH1750_STATUS BH1750_SetMtreg(uint8_t Mtreg)
 	tmp[0] = (0x40 | (Mtreg >> 5));
 	tmp[1] = (0x60 | (Mtreg & 0x1F));
 
-	retCode = HAL_I2C_Master_Transmit(bh1750_i2c, BH1750_ADDRESS, &tmp[0], 1, 10);
+	retCode = HAL_I2C_Master_Transmit(bh1750_i2c, BH1750_CurrentAddress, &tmp[0], 1, 10);
 	if (HAL_OK != retCode) {
 		return BH1750_ERROR;
 	}
 
-	retCode = HAL_I2C_Master_Transmit(bh1750_i2c, BH1750_ADDRESS, &tmp[1], 1, 10);
+	retCode = HAL_I2C_Master_Transmit(bh1750_i2c, BH1750_CurrentAddress, &tmp[1], 1, 10);
 	if (HAL_OK == retCode) {
 		return BH1750_OK;
 	}
@@ -128,7 +129,7 @@ BH1750_STATUS BH1750_ReadLight(float *Result)
 	float result;
 	uint8_t tmp[2];
 
-	if(HAL_OK == HAL_I2C_Master_Receive(bh1750_i2c, BH1750_ADDRESS, tmp, 2, 10))
+	if(HAL_OK == HAL_I2C_Master_Receive(bh1750_i2c, BH1750_CurrentAddress, tmp, 2, 10))
 	{
 		result = (tmp[0] << 8) | (tmp[1]);
 

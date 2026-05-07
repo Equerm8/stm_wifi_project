@@ -14,7 +14,7 @@
 #ifndef BH1750_H_
 #define BH1750_H_
 
-#define BH1750_ADDRESS			(0x23<<1)
+extern uint8_t BH1750_CurrentAddress;
 
 #define	BH1750_POWER_DOWN		0x00
 #define	BH1750_POWER_ON			0x01

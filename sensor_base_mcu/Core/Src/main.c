@@ -55,7 +55,6 @@ volatile uint32_t led_ticks;
 volatile bool is_usr_btn_pressed;
 uint8_t btn_pressed_msg[]="Button pressed!";
 DHT11_t DHT11 = {.GPIOx = DHT_control_GPIO_Port, .GPIO_Pin = DHT_control_Pin, .htim = &htim6};
-float light_intensity;
 
 /* USER CODE END PV */
 
@@ -122,33 +121,36 @@ int main(void)
     /* USER CODE BEGIN 3 */
         DHT11_Process(&DHT11);
 
-        if (DHT11.state == DHT_STATE_START)
-        {
-            char msg[64];
-            int len = sprintf(msg, "Humidity: %d%%, Temp: %d C\r\n", DHT11.humidity, DHT11.temperature);
-            HAL_UART_Transmit(&huart2, (uint8_t*)msg, len, 100);
-            led_ticks = 0;
-        }
-
         // blink
         if (led_ticks >= 2000)
         {
+            led_ticks = 0;
+            HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
 
-          BH1750_STATUS status = BH1750_ReadLight(&light_intensity);
-          if (status == BH1750_OK)
-          {
-            char msg[64];
-            int len = sprintf(msg, "Light intensity: %d", (int)light_intensity);
-            HAL_UART_Transmit(&huart2, (uint8_t*)msg, len, 100);
-          }
-          else
-          {
-              HAL_UART_Transmit(&huart2, (uint8_t*)"BH1750 Error!\r\n", 15, 100);
-          }
+            float light1, light2;
+            // (ADDR -> GND)
+            BH1750_CurrentAddress = (0x23 << 1);
+            BH1750_STATUS status1 = BH1750_ReadLight(&light1);
+            //  (ADDR -> VCC)
+            BH1750_CurrentAddress = (0x5C << 1);
+            BH1750_STATUS status2 = BH1750_ReadLight(&light2);
+
+            if (status1 == BH1750_OK && status2 == BH1750_OK)
+            {
+                char msg[128];
+                int len = sprintf(msg, "T: %d | H: %d | L_V: %d | L_G: %d \r\n",
+                        DHT11.temperature,
+                        DHT11.humidity,
+                        (int)light2,
+                        (int)light1);
+                HAL_UART_Transmit(&huart2, (uint8_t*)msg, len, 100);
+            }
+            else
+            {
+                HAL_UART_Transmit(&huart2, (uint8_t*)"BH1750 [VCC&GND] Error!\r", 15, 100);
+            }
 
 
-          HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
-          led_ticks=0;
         }
 
         if (is_usr_btn_pressed)
