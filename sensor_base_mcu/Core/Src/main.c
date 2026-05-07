@@ -29,6 +29,7 @@
 #include <stdio.h>
 #include "dht11.h"
 #include "bh1750.h"
+#include "BMPXX80.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -108,7 +109,7 @@ int main(void)
   BH1750_Init(&hi2c1);
   BH1750_SetMode(CONTINUOUS_HIGH_RES_MODE);
 
-
+  BMP280_Init(&hi2c1, BMP280_TEMPERATURE_16BIT, BMP280_STANDARD, BMP280_NORMALMODE);
 
   /* USER CODE END 2 */
 
@@ -135,12 +136,15 @@ int main(void)
             BH1750_CurrentAddress = (0x5C << 1);
             BH1750_STATUS status2 = BH1750_ReadLight(&light2);
 
+            float pressure = BMP280_ReadPressure();
+
             if (status1 == BH1750_OK && status2 == BH1750_OK)
             {
                 char msg[128];
-                int len = sprintf(msg, "T: %d | H: %d | L_V: %d | L_G: %d \r\n",
+                int len = sprintf(msg, "T: %d | H: %d | P: %d | L_V: %d | L_G: %d\r\n",
                         DHT11.temperature,
                         DHT11.humidity,
+                        (int)pressure,
                         (int)light2,
                         (int)light1);
                 HAL_UART_Transmit(&huart2, (uint8_t*)msg, len, 100);
