@@ -72,7 +72,7 @@ void handleData()
   if (server.hasArg("l_g")) l_g = server.arg("l_g");
   String mess = "T" + String(t) + "|H" + String(h) + "|P" + String(p) + "|L_V" + String(l_v) + "|L_G" + String(l_g);
   Serial.println(mess);
-  mySerial.print(mess);
+  mySerial.println(mess);
 
   server.send(200, "text/plain", "OK");
 }

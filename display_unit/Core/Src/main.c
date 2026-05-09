@@ -58,10 +58,10 @@ char wifi_connection_str[32] = "WiFi connection:";
 char temperature_str[32] = "Temperature:";
 char humidity_str[32] = "Humidity:";
 char light_sensor_str[32] = "Light intensity:";
-char pressure_str[32] = "Pressure:";
-
-
-
+char pressure_str[32] = "PreAssure:";
+uint8_t rx_byte;
+char rx_buffer[64];
+uint8_t rx_index = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -107,10 +107,10 @@ int main(void)
   MX_USART2_UART_Init();
   MX_SPI1_Init();
   MX_TIM6_Init();
+  MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
     System_Init();
     SysTick_Config(80000000 / 100000); // 0.01 ms
-
 
     LCD_SCAN_DIR Lcd_ScanDir = SCAN_DIR_DFT;//SCAN_DIR_DFT = D2U_L2R
     HAL_GPIO_WritePin(LCD_BL_GPIO_Port, LCD_BL_Pin, GPIO_PIN_SET);
@@ -140,18 +140,19 @@ int main(void)
     GUI_DisString_EN(0, y_pos, light_sensor_str, &Font24, WHITE, BLACK);
     y_pos += 24;
 
+    HAL_UART_Receive_IT(&huart3, &rx_byte, 1);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
     while (1)
     {
-    /* USER CODE END WHILE */
-        if (ticks >= 100)
-        {
 
-        }
+    /* USER CODE END WHILE */
+
     /* USER CODE BEGIN 3 */
+
 
     }
   /* USER CODE END 3 */
@@ -208,7 +209,17 @@ void SystemClock_Config(void)
 
 /* USER CODE BEGIN 4 */
 
+/* USER CODE BEGIN 4 */
+/* USER CODE BEGIN 4 */
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+    if (huart->Instance == USART3)
+    {
 
+        HAL_UART_Transmit(&huart2, &rx_byte, 1, 10);
+        HAL_UART_Receive_IT(&huart3, &rx_byte, 1);
+    }
+}
 /* USER CODE END 4 */
 
 /**
