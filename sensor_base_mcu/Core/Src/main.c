@@ -106,6 +106,10 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   SysTick_Config(SystemCoreClock / 1000);
+  BH1750_CurrentAddress = (0x23 << 1);
+  BH1750_Init(&hi2c1);
+  BH1750_SetMode(CONTINUOUS_HIGH_RES_MODE);
+  BH1750_CurrentAddress = (0x5C << 1);
   BH1750_Init(&hi2c1);
   BH1750_SetMode(CONTINUOUS_HIGH_RES_MODE);
 
@@ -141,7 +145,7 @@ int main(void)
             if (status1 == BH1750_OK && status2 == BH1750_OK)
             {
                 char msg[128];
-                int len = sprintf(msg, "T: %d | H: %d | P: %d | L_V: %d | L_G: %d\r\n",
+                int len = sprintf(msg, "T%d|H%d|P%d|L_V%d|L_G%d\r\n",
                         DHT11.temperature,
                         DHT11.humidity,
                         (int)pressure,
