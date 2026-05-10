@@ -41,7 +41,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+#define MESS_SIZE 64
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -60,8 +60,9 @@ char humidity_str[32] = "Humidity:";
 char light_sensor_str[32] = "Light intensity:";
 char pressure_str[32] = "PreAssure:";
 uint8_t rx_byte;
-char rx_buffer[64];
-uint8_t rx_index = 0;
+uint8_t rx_mess[MESS_SIZE];
+volatile uint8_t j = -1;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -140,7 +141,7 @@ int main(void)
     GUI_DisString_EN(0, y_pos, light_sensor_str, &Font24, WHITE, BLACK);
     y_pos += 24;
 
-    HAL_UART_Receive_IT(&huart3, &rx_byte, 1);
+    HAL_UART_Receive_IT(&huart2, &rx_byte, 1);
 
   /* USER CODE END 2 */
 
@@ -207,18 +208,29 @@ void SystemClock_Config(void)
   }
 }
 
-/* USER CODE BEGIN 4 */
 
-/* USER CODE BEGIN 4 */
 /* USER CODE BEGIN 4 */
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-    if (huart->Instance == USART3)
+    if (huart->Instance == USART2)
     {
-
-        HAL_UART_Transmit(&huart2, &rx_byte, 1, 10);
-        HAL_UART_Receive_IT(&huart3, &rx_byte, 1);
+        if (rx_byte == '$')
+        {
+            HAL_UART_Transmit(&huart2, rx_mess, j+1, 100);
+            for (int i = 0; i < MESS_SIZE; i++)
+            {
+                rx_mess[i] = ' ';
+            }
+            j=-1;
+        }
+        else
+        {
+            ++j;
+            rx_mess[j] = rx_byte;
+        }
+        HAL_UART_Receive_IT(&huart2, &rx_byte, 1);
     }
+
 }
 /* USER CODE END 4 */
 

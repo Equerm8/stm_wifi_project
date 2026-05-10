@@ -3,6 +3,7 @@
 	<name>Core</name>
 	<comment></comment>
 	<projects>
+		<project>display_unit</project>
 	</projects>
 	<buildSpec>
 	</buildSpec>

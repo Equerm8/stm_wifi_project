@@ -53,6 +53,7 @@ String p;
 String l_v;
 String l_g;
 int last;
+String terminator = "$";
 
 ESP8266WebServer server(80);
 
@@ -70,7 +71,7 @@ void handleData()
   if (server.hasArg("p")) p = server.arg("p");
   if (server.hasArg("l_v")) l_v = server.arg("l_v");
   if (server.hasArg("l_g")) l_g = server.arg("l_g");
-  String mess = "T" + String(t) + "|H" + String(h) + "|P" + String(p) + "|L_V" + String(l_v) + "|L_G" + String(l_g);
+  String mess = "T" + String(t) + "|H" + String(h) + "|P" + String(p) + "|L_V" + String(l_v) + "|L_G" + String(l_g) + terminator;
   Serial.println(mess);
   mySerial.println(mess);
 
