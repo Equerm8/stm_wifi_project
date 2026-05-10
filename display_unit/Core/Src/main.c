@@ -77,7 +77,11 @@ volatile int16_t j = -1;
 bool analyze_mess_rdy;
 bool wifi_show_flag;
 bool wifi_connection;
+bool buzzer_active;
 int last_wifi_check;
+int last_tick_time;
+int hum;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -179,6 +183,26 @@ int main(void)
             show_wifi(wifi_connection);
         }
 
+        // hum alarm
+        if (hum >= 60)
+        {
+            if (HAL_GetTick() - last_tick_time >= 10000)
+            {
+                HAL_GPIO_TogglePin(BUZZER_GPIO_Port, BUZZER_Pin);
+                last_tick_time = HAL_GetTick();
+                buzzer_active = true;
+            }
+        }
+        else
+        {
+            if (buzzer_active)
+            {
+                HAL_GPIO_WritePin(BUZZER_GPIO_Port, BUZZER_Pin, 0);
+                buzzer_active = false;
+            }
+
+        }
+
 
     }
   /* USER CODE END 3 */
@@ -249,10 +273,18 @@ void analyze_mess(void)
     if (rx_byte == '$')
     {
         rx_mess[j + 1] = '\0';
-        int temp, hum;
+        // hum external for buzzer
+        int temp;
         int l_v, l_g;
         int p;
         int var_num = sscanf((char*)rx_mess, " T%d|H%d|P%d|L_V%d|L_G%d", &temp, &hum, &p, &l_v, &l_g);
+
+        // buzzer alarm
+        if (hum >= 60)
+        {
+
+        }
+
         if (var_num == 5)
         {
             char buff[16];

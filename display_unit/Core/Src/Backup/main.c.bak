@@ -41,6 +41,7 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 #define MESS_SIZE 64
+#define LETTER_WIDTH 17
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -58,12 +59,12 @@ uint8_t hum_pos = 24*2;
 uint8_t press_pos = 24*3;
 uint8_t lightV_pos = 24*4;
 uint8_t lightG_pos = 24*5;
-char wifi_connection_str[32] = "WiFi connection: ";
-char temperature_str[32] = "Temperature: ";
-char humidity_str[32] = "Humidity: ";
-char pressure_str[32] = "Preassure: ";
-char light_sensorV_str[32] = "Light_V intensity: ";
-char light_sensorG_str[32] = "Light_G intensity: ";
+char wifi_connection_str[] = "WiFi connection: ";
+char temperature_str[] = "Temperature: ";
+char humidity_str[] = "Humidity: ";
+char pressure_str[] = "Pressure: ";
+char light_sensorV_str[] = "Light_V intensity: ";
+char light_sensorG_str[] = "Light_G intensity: ";
 uint8_t wifi_len = sizeof(wifi_connection_str);
 uint8_t temp_len = sizeof(temperature_str);
 uint8_t hum_len = sizeof(humidity_str);
@@ -72,15 +73,18 @@ uint8_t lightV_len = sizeof(light_sensorV_str);
 uint8_t lightG_len = sizeof(light_sensorG_str);
 uint8_t rx_byte;
 uint8_t rx_mess[MESS_SIZE];
-volatile uint8_t j = -1;
+volatile int16_t j = -1;
 bool analyze_mess_rdy;
-
+bool wifi_show_flag;
+bool wifi_connection;
+int last_wifi_check;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 void analyze_mess(void);
+void show_wifi(bool state);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -140,7 +144,7 @@ int main(void)
     GUI_DisString_EN(0, lightV_pos, light_sensorV_str, &Font24, WHITE, BLACK);
     GUI_DisString_EN(0, lightG_pos, light_sensorG_str, &Font24, WHITE, BLACK);
 
-
+    __HAL_UART_CLEAR_IT(&huart4, UART_CLEAR_OREF | UART_CLEAR_NEF | UART_CLEAR_FEF | UART_CLEAR_PEF);
     HAL_UART_Receive_IT(&huart4, &rx_byte, 1);
 
   /* USER CODE END 2 */
@@ -154,15 +158,27 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
-        /*
+
         if (analyze_mess_rdy)
         {
-            HAL_UART_Transmit(&huart2, "TUTAJ", 5, 100);
-            HAL_UART_Receive_IT(&huart4, &rx_byte, 1);
+            if (wifi_connection == false)
+            {
+                wifi_connection = true;
+                show_wifi(wifi_connection);
+            }
+
+            last_wifi_check = HAL_GetTick();
+
             analyze_mess_rdy = false;
             analyze_mess();
         }
-        */
+
+        else if (wifi_connection == true && (HAL_GetTick() - last_wifi_check) >= 500000)
+        {
+            wifi_connection = false;
+            show_wifi(wifi_connection);
+        }
+
 
     }
   /* USER CODE END 3 */
@@ -222,8 +238,9 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
     if (huart->Instance == UART4)
     {
-        HAL_UART_Transmit(&huart2, &rx_byte, 1, 100);
+        HAL_UART_Transmit(&huart2, &rx_byte, sizeof(rx_byte), 100);
         HAL_UART_Receive_IT(&huart4, &rx_byte, 1);
+        analyze_mess_rdy = true;
     }
 }
 
@@ -231,39 +248,73 @@ void analyze_mess(void)
 {
     if (rx_byte == '$')
     {
+        rx_mess[j + 1] = '\0';
         int temp, hum;
         int l_v, l_g;
         int p;
-        int var_num = sscanf((char*)rx_mess, "T%d|H%d|P%d|L_V%d|L_G%d", &temp, &hum, &p, &l_v, &l_g);
+        int var_num = sscanf((char*)rx_mess, " T%d|H%d|P%d|L_V%d|L_G%d", &temp, &hum, &p, &l_v, &l_g);
         if (var_num == 5)
         {
-            char temp_show[32];
-            char hum_show[32];
-            char p_show[32];
-            char lv_show[32];
-            char lg_show[32];
-            sprintf(temp_show, "Temperature: %d", temp);
-            sprintf(hum_show, "Temperature: %d", hum);
-            sprintf(p_show, "Temperature: %d", p);
-            sprintf(lv_show, "Temperature: %d", l_v);
-            sprintf(lg_show, "Temperature: %d", l_g);
-            //LCD_Clear(WHITE);
-            GUI_DisString_EN(0, temp_pos, temp_show, &Font24, WHITE, BLACK);
-            GUI_DisString_EN(0, hum_pos, hum_show, &Font24, WHITE, BLACK);
-            GUI_DisString_EN(0, press_pos, p_show, &Font24, WHITE, BLACK);
-            GUI_DisString_EN(0, lightV_pos, lv_show, &Font24, WHITE, BLACK);
-            GUI_DisString_EN(0, lightG_pos, lg_show, &Font24, WHITE, BLACK);
-        }
+            char buff[16];
 
-        for (uint8_t i = 0; i < MESS_SIZE; i++) rx_mess[i] = ' ';
-        j=-1;
+            sprintf(buff, "%d  ", temp);
+            int x_temp = (temp_len-1)*LETTER_WIDTH;
+            GUI_DrawRectangle(x_temp, temp_pos, 480, temp_pos + 24, WHITE, DRAW_FULL, DOT_PIXEL_1X1);
+            GUI_DisString_EN(x_temp, temp_pos, buff, &Font24, WHITE, BLACK);
+
+
+            sprintf(buff, "%d  ", hum);
+            x_temp = (hum_len-1)*LETTER_WIDTH;
+            GUI_DrawRectangle(x_temp, hum_pos, 480, hum_pos + 24, WHITE, DRAW_FULL, DOT_PIXEL_1X1);
+            GUI_DisString_EN(x_temp, hum_pos, buff, &Font24, WHITE, BLACK);
+
+
+            sprintf(buff, "%d  ", p);
+            x_temp = (press_len-1)*LETTER_WIDTH;
+            GUI_DrawRectangle(x_temp, press_pos, 480, press_pos + 24, WHITE, DRAW_FULL, DOT_PIXEL_1X1);
+            GUI_DisString_EN(x_temp, press_pos, buff, &Font24, WHITE, BLACK);
+
+
+            sprintf(buff, "%d  ", l_v);
+            x_temp = (lightV_len-1)*LETTER_WIDTH;
+            GUI_DrawRectangle(x_temp, lightV_pos, 480, lightV_pos + 24, WHITE, DRAW_FULL, DOT_PIXEL_1X1);
+            GUI_DisString_EN(x_temp, lightV_pos, buff, &Font24, WHITE, BLACK);
+
+
+            sprintf(buff, "%d  ", l_g);
+            x_temp = (lightG_len-1)*LETTER_WIDTH;
+            GUI_DrawRectangle(x_temp, lightG_pos, 480, lightG_pos + 24, WHITE, DRAW_FULL, DOT_PIXEL_1X1);
+            GUI_DisString_EN(x_temp, lightG_pos, buff, &Font24, WHITE, BLACK);
+
+        }
+        j = -1;
     }
     else
     {
-        ++j;
-        rx_mess[j] = rx_byte;
+        if (j == -1 && (rx_byte == '\r' || rx_byte == '\n')) return;
+        if (j < MESS_SIZE - 1)
+        {
+            rx_mess[++j] = rx_byte;
+        }
+    }
+}
+
+void show_wifi(bool state)
+{
+    char buff[4];
+    if (state)
+    {
+        sprintf(buff, "YES");
+    }
+    else
+    {
+        sprintf(buff, "NO!");
     }
 
+
+    int x_temp = (wifi_len-1)*LETTER_WIDTH;
+    GUI_DrawRectangle(x_temp, wifi_pos, 480, wifi_pos + 24, WHITE, DRAW_FULL, DOT_PIXEL_1X1);
+    GUI_DisString_EN(x_temp, wifi_pos, buff, &Font24, WHITE, BLACK);
 }
 /* USER CODE END 4 */
 
