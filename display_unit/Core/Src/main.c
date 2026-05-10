@@ -31,7 +31,6 @@
 #include "LCD_Driver.h"
 #include "LCD_GUI.h"
 #include "fonts.h"
-#include "operational_variables.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -42,6 +41,7 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 #define MESS_SIZE 64
+#define LETTER_WIDTH 17
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -53,22 +53,38 @@
 
 /* USER CODE BEGIN PV */
 volatile uint32_t ticks;
-uint16_t y_pos = 0;
-char wifi_connection_str[32] = "WiFi connection:";
-char temperature_str[32] = "Temperature:";
-char humidity_str[32] = "Humidity:";
-char light_sensor_str[32] = "Light intensity:";
-char pressure_str[32] = "PreAssure:";
+uint8_t wifi_pos = 0;
+uint8_t temp_pos = 24;
+uint8_t hum_pos = 24*2;
+uint8_t press_pos = 24*3;
+uint8_t lightV_pos = 24*4;
+uint8_t lightG_pos = 24*5;
+char wifi_connection_str[] = "WiFi connection: ";
+char temperature_str[] = "Temperature: ";
+char humidity_str[] = "Humidity: ";
+char pressure_str[] = "Pressure: ";
+char light_sensorV_str[] = "Light_V intensity: ";
+char light_sensorG_str[] = "Light_G intensity: ";
+uint8_t wifi_len = sizeof(wifi_connection_str);
+uint8_t temp_len = sizeof(temperature_str);
+uint8_t hum_len = sizeof(humidity_str);
+uint8_t press_len = sizeof(pressure_str);
+uint8_t lightV_len = sizeof(light_sensorV_str);
+uint8_t lightG_len = sizeof(light_sensorG_str);
 uint8_t rx_byte;
 uint8_t rx_mess[MESS_SIZE];
-volatile uint8_t j = -1;
-
+volatile int16_t j = -1;
+bool analyze_mess_rdy;
+bool wifi_show_flag;
+bool wifi_connection;
+int last_wifi_check;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-
+void analyze_mess(void);
+void show_wifi(bool state);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -108,7 +124,7 @@ int main(void)
   MX_USART2_UART_Init();
   MX_SPI1_Init();
   MX_TIM6_Init();
-  MX_USART3_UART_Init();
+  MX_UART4_Init();
   /* USER CODE BEGIN 2 */
     System_Init();
     SysTick_Config(80000000 / 100000); // 0.01 ms
@@ -121,27 +137,15 @@ int main(void)
 
 
     // gui init
-    get_wifi_status(wifi_connection_str);
-    GUI_DisString_EN(0, y_pos, wifi_connection_str, &Font24, WHITE, BLACK);
-    y_pos += 24;
+    GUI_DisString_EN(0, wifi_pos, wifi_connection_str, &Font24, WHITE, BLACK);
+    GUI_DisString_EN(0, temp_pos, temperature_str, &Font24, WHITE, BLACK);
+    GUI_DisString_EN(0, hum_pos, humidity_str, &Font24, WHITE, BLACK);
+    GUI_DisString_EN(0, press_pos, pressure_str, &Font24, WHITE, BLACK);
+    GUI_DisString_EN(0, lightV_pos, light_sensorV_str, &Font24, WHITE, BLACK);
+    GUI_DisString_EN(0, lightG_pos, light_sensorG_str, &Font24, WHITE, BLACK);
 
-    get_temperature(temperature_str);
-    GUI_DisString_EN(0, y_pos, temperature_str, &Font24, WHITE, BLACK);
-    y_pos += 24;
-
-    get_humidity(humidity_str);
-    GUI_DisString_EN(0, y_pos, humidity_str, &Font24, WHITE, BLACK);
-    y_pos += 24;
-
-    get_pressure(pressure_str);
-    GUI_DisString_EN(0, y_pos, pressure_str, &Font24, WHITE, BLACK);
-    y_pos += 24;
-
-    get_light_intensity(light_sensor_str);
-    GUI_DisString_EN(0, y_pos, light_sensor_str, &Font24, WHITE, BLACK);
-    y_pos += 24;
-
-    HAL_UART_Receive_IT(&huart2, &rx_byte, 1);
+    __HAL_UART_CLEAR_IT(&huart4, UART_CLEAR_OREF | UART_CLEAR_NEF | UART_CLEAR_FEF | UART_CLEAR_PEF);
+    HAL_UART_Receive_IT(&huart4, &rx_byte, 1);
 
   /* USER CODE END 2 */
 
@@ -153,6 +157,27 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+
+
+        if (analyze_mess_rdy)
+        {
+            if (wifi_connection == false)
+            {
+                wifi_connection = true;
+                show_wifi(wifi_connection);
+            }
+
+            last_wifi_check = HAL_GetTick();
+
+            analyze_mess_rdy = false;
+            analyze_mess();
+        }
+
+        else if (wifi_connection == true && (HAL_GetTick() - last_wifi_check) >= 500000)
+        {
+            wifi_connection = false;
+            show_wifi(wifi_connection);
+        }
 
 
     }
@@ -208,29 +233,88 @@ void SystemClock_Config(void)
   }
 }
 
-
 /* USER CODE BEGIN 4 */
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-    if (huart->Instance == USART2)
+    if (huart->Instance == UART4)
     {
-        if (rx_byte == '$')
+        HAL_UART_Transmit(&huart2, &rx_byte, sizeof(rx_byte), 100);
+        HAL_UART_Receive_IT(&huart4, &rx_byte, 1);
+        analyze_mess_rdy = true;
+    }
+}
+
+void analyze_mess(void)
+{
+    if (rx_byte == '$')
+    {
+        rx_mess[j + 1] = '\0';
+        int temp, hum;
+        int l_v, l_g;
+        int p;
+        int var_num = sscanf((char*)rx_mess, " T%d|H%d|P%d|L_V%d|L_G%d", &temp, &hum, &p, &l_v, &l_g);
+        if (var_num == 5)
         {
-            HAL_UART_Transmit(&huart2, rx_mess, j+1, 100);
-            for (int i = 0; i < MESS_SIZE; i++)
-            {
-                rx_mess[i] = ' ';
-            }
-            j=-1;
+            char buff[16];
+
+            sprintf(buff, "%d  ", temp);
+            int x_temp = (temp_len-1)*LETTER_WIDTH;
+            GUI_DrawRectangle(x_temp, temp_pos, 480, temp_pos + 24, WHITE, DRAW_FULL, DOT_PIXEL_1X1);
+            GUI_DisString_EN(x_temp, temp_pos, buff, &Font24, WHITE, BLACK);
+
+
+            sprintf(buff, "%d  ", hum);
+            x_temp = (hum_len-1)*LETTER_WIDTH;
+            GUI_DrawRectangle(x_temp, hum_pos, 480, hum_pos + 24, WHITE, DRAW_FULL, DOT_PIXEL_1X1);
+            GUI_DisString_EN(x_temp, hum_pos, buff, &Font24, WHITE, BLACK);
+
+
+            sprintf(buff, "%d  ", p);
+            x_temp = (press_len-1)*LETTER_WIDTH;
+            GUI_DrawRectangle(x_temp, press_pos, 480, press_pos + 24, WHITE, DRAW_FULL, DOT_PIXEL_1X1);
+            GUI_DisString_EN(x_temp, press_pos, buff, &Font24, WHITE, BLACK);
+
+
+            sprintf(buff, "%d  ", l_v);
+            x_temp = (lightV_len-1)*LETTER_WIDTH;
+            GUI_DrawRectangle(x_temp, lightV_pos, 480, lightV_pos + 24, WHITE, DRAW_FULL, DOT_PIXEL_1X1);
+            GUI_DisString_EN(x_temp, lightV_pos, buff, &Font24, WHITE, BLACK);
+
+
+            sprintf(buff, "%d  ", l_g);
+            x_temp = (lightG_len-1)*LETTER_WIDTH;
+            GUI_DrawRectangle(x_temp, lightG_pos, 480, lightG_pos + 24, WHITE, DRAW_FULL, DOT_PIXEL_1X1);
+            GUI_DisString_EN(x_temp, lightG_pos, buff, &Font24, WHITE, BLACK);
+
         }
-        else
+        j = -1;
+    }
+    else
+    {
+        if (j == -1 && (rx_byte == '\r' || rx_byte == '\n')) return;
+        if (j < MESS_SIZE - 1)
         {
-            ++j;
-            rx_mess[j] = rx_byte;
+            rx_mess[++j] = rx_byte;
         }
-        HAL_UART_Receive_IT(&huart2, &rx_byte, 1);
+    }
+}
+
+void show_wifi(bool state)
+{
+    char buff[4];
+    if (state)
+    {
+        sprintf(buff, "YES");
+    }
+    else
+    {
+        sprintf(buff, "NO!");
     }
 
+
+    int x_temp = (wifi_len-1)*LETTER_WIDTH;
+    GUI_DrawRectangle(x_temp, wifi_pos, 480, wifi_pos + 24, WHITE, DRAW_FULL, DOT_PIXEL_1X1);
+    GUI_DisString_EN(x_temp, wifi_pos, buff, &Font24, WHITE, BLACK);
 }
 /* USER CODE END 4 */
 

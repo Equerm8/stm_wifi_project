@@ -81,7 +81,7 @@ void handleData()
 void setup() {
   delay(1000);
   Serial.begin(115200);
-  mySerial.begin(115200);
+  mySerial.begin(9600);
   Serial.println();
   Serial.print("Configuring access point...");
   /* You can remove the password parameter if you want the AP to be open. */
@@ -99,11 +99,4 @@ void setup() {
 
 void loop() {
   server.handleClient();
-  if (millis() - last >= 2000)
-  {
-
-    last = millis();
-  }
-
-
 }
