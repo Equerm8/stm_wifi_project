@@ -2,9 +2,55 @@
 	(version 20260306)
 	(generator "eeschema")
 	(generator_version "10.0")
-	(uuid e5949f95-2d9e-4fb3-bbe4-3c2b333ddcca)
+	(uuid "e5949f95-2d9e-4fb3-bbe4-3c2b333ddcca")
 	(paper "A4")
 	(lib_symbols)
+	(sheet
+		(at 49.53 62.23)
+		(size 30.48 25.4)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0)
+		)
+		(uuid "beb408b9-6b1c-49f2-81ae-487de1cad739")
+		(property "Sheetname" "Sensor based MCU"
+			(at 49.53 61.5184 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "sensor-based-mcu.kicad_sch"
+			(at 49.53 88.2146 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "main_schematic"
+				(path "/e5949f95-2d9e-4fb3-bbe4-3c2b333ddcca"
+					(page "2")
+				)
+			)
+		)
+	)
 	(sheet_instances
 		(path "/"
 			(page "1")
