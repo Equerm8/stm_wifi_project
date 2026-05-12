@@ -1,0 +1,12 @@
+(kicad_sch
+	(version 20260306)
+	(generator "eeschema")
+	(generator_version "10.0")
+	(uuid "4db69ac2-2f65-4455-915c-1dd246843549")
+	(paper "A4")
+	(title_block
+		(date "2026-05-12")
+		(company "Marcel Siwiela")
+	)
+	(lib_symbols)
+)
