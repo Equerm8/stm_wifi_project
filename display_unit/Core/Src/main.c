@@ -31,10 +31,17 @@
 #include "LCD_Driver.h"
 #include "LCD_GUI.h"
 #include "fonts.h"
+#include <inttypes.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
+
+typedef struct {
+    uint16_t y_pos;
+    const char* label;
+    uint8_t label_len;
+} DisplayRow;
 
 /* USER CODE END PTD */
 
@@ -42,6 +49,8 @@
 /* USER CODE BEGIN PD */
 #define MESS_SIZE 64
 #define LETTER_WIDTH 17
+#define FONT_SIZE 24
+#define SCREEN_WIDTH 480
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -52,25 +61,18 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+const DisplayRow sensor_rows[] = {
+        {FONT_SIZE*0, "WiFi connection: ", 17},
+        {FONT_SIZE*1, "Temperature: ", 13},
+        {FONT_SIZE*2, "Humidity: ", 10},
+        {FONT_SIZE*3, "Pressure: ", 10},
+        {FONT_SIZE*4, "Light_V intensity: ", 19},
+        {FONT_SIZE*5, "Light_G intensity: ", 19}
+};
+const uint8_t SENSOR_ROWS_LEN = sizeof(sensor_rows) / sizeof(sensor_rows[0]);
+
 volatile uint32_t ticks;
-uint8_t wifi_pos = 0;
-uint8_t temp_pos = 24;
-uint8_t hum_pos = 24*2;
-uint8_t press_pos = 24*3;
-uint8_t lightV_pos = 24*4;
-uint8_t lightG_pos = 24*5;
-char wifi_connection_str[] = "WiFi connection: ";
-char temperature_str[] = "Temperature: ";
-char humidity_str[] = "Humidity: ";
-char pressure_str[] = "Pressure: ";
-char light_sensorV_str[] = "Light_V intensity: ";
-char light_sensorG_str[] = "Light_G intensity: ";
-uint8_t wifi_len = sizeof(wifi_connection_str);
-uint8_t temp_len = sizeof(temperature_str);
-uint8_t hum_len = sizeof(humidity_str);
-uint8_t press_len = sizeof(pressure_str);
-uint8_t lightV_len = sizeof(light_sensorV_str);
-uint8_t lightG_len = sizeof(light_sensorG_str);
+
 uint8_t rx_byte;
 uint8_t rx_mess[MESS_SIZE];
 volatile int16_t j = -1;
@@ -89,6 +91,7 @@ void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 void analyze_mess(void);
 void show_wifi(bool state);
+//void update_disp_val(uint32_t value, const DisplayRow row);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -138,15 +141,14 @@ int main(void)
     LCD_Init(Lcd_ScanDir, 800);
     LCD_Clear(WHITE);
 
-
-
     // gui init
-    GUI_DisString_EN(0, wifi_pos, wifi_connection_str, &Font24, WHITE, BLACK);
-    GUI_DisString_EN(0, temp_pos, temperature_str, &Font24, WHITE, BLACK);
-    GUI_DisString_EN(0, hum_pos, humidity_str, &Font24, WHITE, BLACK);
-    GUI_DisString_EN(0, press_pos, pressure_str, &Font24, WHITE, BLACK);
-    GUI_DisString_EN(0, lightV_pos, light_sensorV_str, &Font24, WHITE, BLACK);
-    GUI_DisString_EN(0, lightG_pos, light_sensorG_str, &Font24, WHITE, BLACK);
+    for (uint8_t i = 0; i < SENSOR_ROWS_LEN; i++)
+    {
+
+        GUI_DisString_EN(0, sensor_rows[i].y_pos, sensor_rows[i].label, &Font24, WHITE, BLACK);
+
+    }
+
 
     __HAL_UART_CLEAR_IT(&huart4, UART_CLEAR_OREF | UART_CLEAR_NEF | UART_CLEAR_FEF | UART_CLEAR_PEF);
     HAL_UART_Receive_IT(&huart4, &rx_byte, 1);
@@ -278,45 +280,19 @@ void analyze_mess(void)
         int l_v, l_g;
         int p;
         int var_num = sscanf((char*)rx_mess, " T%d|H%d|P%d|L_V%d|L_G%d", &temp, &hum, &p, &l_v, &l_g);
-
-        // buzzer alarm
-        if (hum >= 60)
-        {
-
-        }
+        uint32_t vars[] = {temp, hum, p, l_v, l_g};
 
         if (var_num == 5)
         {
             char buff[16];
 
-            sprintf(buff, "%d  ", temp);
-            int x_temp = (temp_len-1)*LETTER_WIDTH;
-            GUI_DrawRectangle(x_temp, temp_pos, 480, temp_pos + 24, WHITE, DRAW_FULL, DOT_PIXEL_1X1);
-            GUI_DisString_EN(x_temp, temp_pos, buff, &Font24, WHITE, BLACK);
-
-
-            sprintf(buff, "%d  ", hum);
-            x_temp = (hum_len-1)*LETTER_WIDTH;
-            GUI_DrawRectangle(x_temp, hum_pos, 480, hum_pos + 24, WHITE, DRAW_FULL, DOT_PIXEL_1X1);
-            GUI_DisString_EN(x_temp, hum_pos, buff, &Font24, WHITE, BLACK);
-
-
-            sprintf(buff, "%d  ", p);
-            x_temp = (press_len-1)*LETTER_WIDTH;
-            GUI_DrawRectangle(x_temp, press_pos, 480, press_pos + 24, WHITE, DRAW_FULL, DOT_PIXEL_1X1);
-            GUI_DisString_EN(x_temp, press_pos, buff, &Font24, WHITE, BLACK);
-
-
-            sprintf(buff, "%d  ", l_v);
-            x_temp = (lightV_len-1)*LETTER_WIDTH;
-            GUI_DrawRectangle(x_temp, lightV_pos, 480, lightV_pos + 24, WHITE, DRAW_FULL, DOT_PIXEL_1X1);
-            GUI_DisString_EN(x_temp, lightV_pos, buff, &Font24, WHITE, BLACK);
-
-
-            sprintf(buff, "%d  ", l_g);
-            x_temp = (lightG_len-1)*LETTER_WIDTH;
-            GUI_DrawRectangle(x_temp, lightG_pos, 480, lightG_pos + 24, WHITE, DRAW_FULL, DOT_PIXEL_1X1);
-            GUI_DisString_EN(x_temp, lightG_pos, buff, &Font24, WHITE, BLACK);
+            for (uint8_t i = 1; i < SENSOR_ROWS_LEN; i++)
+            {
+                sprintf(buff, "%" PRIu32 " ", vars[i-1]);
+                int x_temp = (sensor_rows[i].label_len)*LETTER_WIDTH;
+                GUI_DrawRectangle(x_temp, sensor_rows[i].y_pos, SCREEN_WIDTH, sensor_rows[i].y_pos + FONT_SIZE, WHITE, DRAW_FULL, DOT_PIXEL_1X1);
+                GUI_DisString_EN(x_temp, sensor_rows[i].y_pos, buff, &Font24, WHITE, BLACK);
+            }
 
         }
         j = -1;
@@ -344,10 +320,12 @@ void show_wifi(bool state)
     }
 
 
-    int x_temp = (wifi_len-1)*LETTER_WIDTH;
-    GUI_DrawRectangle(x_temp, wifi_pos, 480, wifi_pos + 24, WHITE, DRAW_FULL, DOT_PIXEL_1X1);
-    GUI_DisString_EN(x_temp, wifi_pos, buff, &Font24, WHITE, BLACK);
+    int x_temp = (sensor_rows[0].label_len)*LETTER_WIDTH;
+    GUI_DrawRectangle(x_temp, sensor_rows[0].y_pos, SCREEN_WIDTH, sensor_rows[0].y_pos + FONT_SIZE, WHITE, DRAW_FULL, DOT_PIXEL_1X1);
+    GUI_DisString_EN(x_temp, sensor_rows[0].y_pos, buff, &Font24, WHITE, BLACK);
 }
+
+
 /* USER CODE END 4 */
 
 /**
