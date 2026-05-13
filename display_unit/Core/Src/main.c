@@ -70,8 +70,8 @@ bool analyze_mess_rdy;
 bool wifi_show_flag;
 bool wifi_connection;
 bool buzzer_active;
-int last_wifi_check;
-int last_tick_time;
+uint32_t last_wifi_check;
+uint32_t last_tick_time;
 int hum;
 
 /* USER CODE END PV */
@@ -162,31 +162,14 @@ int main(void)
             analyze_mess_rdy = false;
             analyze_mess();
         }
-
         else if (wifi_connection == true && (HAL_GetTick() - last_wifi_check) >= 500000)
         {
             wifi_connection = false;
             show_wifi(wifi_connection);
         }
 
-        // hum alarm
-        if (hum >= 60)
-        {
-            if (HAL_GetTick() - last_tick_time >= 10000)
-            {
-                HAL_GPIO_TogglePin(BUZZER_GPIO_Port, BUZZER_Pin);
-                last_tick_time = HAL_GetTick();
-                buzzer_active = true;
-            }
-        }
-        else
-        {
-            if (buzzer_active)
-            {
-                HAL_GPIO_WritePin(BUZZER_GPIO_Port, BUZZER_Pin, 0);
-                buzzer_active = false;
-            }
-        }
+        check_alarm();
+
     }
     /* USER CODE END 3 */
 }

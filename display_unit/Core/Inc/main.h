@@ -41,6 +41,16 @@ extern "C" {
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
+typedef enum {
+    ROW_WIFI = 0,
+    ROW_TEMP,
+    ROW_HUM,
+    ROW_PRESS,
+    ROW_LIGHT_V,
+    ROW_LIGHT_G,
+    ROW_COUNT
+}SensorRowIndex;
+
 typedef struct {
     uint16_t y_pos;
     const char* label;
@@ -53,14 +63,14 @@ typedef struct {
 extern const DisplayRow sensor_rows[];
 extern const uint8_t SENSOR_ROWS_LEN;
 extern uint8_t rx_byte;
-extern uint8_t rx_mess[MESS_SIZE];
 extern volatile int16_t j;
 extern bool analyze_mess_rdy;
 extern bool wifi_show_flag;
 extern bool wifi_connection;
 extern bool buzzer_active;
-extern int last_wifi_check;
-extern int last_tick_time;
+extern uint32_t last_wifi_check;
+extern uint32_t last_tick_time;
+extern uint8_t rx_mess[MESS_SIZE];
 extern int hum;
 /* USER CODE END EC */
 

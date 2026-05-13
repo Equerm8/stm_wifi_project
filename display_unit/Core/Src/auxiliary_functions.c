@@ -6,6 +6,7 @@
 
 void analyze_mess(void)
 {
+
     if (rx_byte == '$')
     {
         rx_mess[j + 1] = '\0';
@@ -44,18 +45,7 @@ void display_text_at_row(const char *text, const DisplayRow *row)
 
 void show_wifi(bool state)
 {
-    char buff[4];
-    if (state)
-    {
-        sprintf(buff, "YES");
-    }
-    else
-    {
-        sprintf(buff, "NO!");
-    }
-    int x_temp = (sensor_rows[0].label_len)*LETTER_WIDTH;
-    GUI_DrawRectangle(x_temp, sensor_rows[0].y_pos, SCREEN_WIDTH, sensor_rows[0].y_pos + FONT_SIZE, WHITE, DRAW_FULL, DOT_PIXEL_1X1);
-    GUI_DisString_EN(x_temp, sensor_rows[0].y_pos, buff, &Font24, WHITE, BLACK);
+    display_text_at_row(state ? "YES" : "NO", &sensor_rows[ROW_WIFI]);
 }
 
 void update_disp_val(uint32_t value, const DisplayRow *row)
@@ -63,4 +53,25 @@ void update_disp_val(uint32_t value, const DisplayRow *row)
     char buff[16];
     sprintf(buff, "%" PRIu32 " ", value);
     display_text_at_row(buff, row);
+}
+
+void check_alarm(void)
+{
+    if (hum >= 60)
+    {
+        if (HAL_GetTick() - last_tick_time >= 10000)
+        {
+            HAL_GPIO_TogglePin(BUZZER_GPIO_Port, BUZZER_Pin);
+            last_tick_time = HAL_GetTick();
+            buzzer_active = true;
+        }
+    }
+    else
+    {
+        if (buzzer_active)
+        {
+            HAL_GPIO_WritePin(BUZZER_GPIO_Port, BUZZER_Pin, 0);
+            buzzer_active = false;
+        }
+    }
 }
