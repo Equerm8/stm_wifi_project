@@ -1,2 +1,5 @@
-../Core/Src/auxiliary_functions.c:7:6:analyze_mess	96	static
-../Core/Src/auxiliary_functions.c:44:6:show_wifi	40	static
+../Core/Src/auxiliary_functions.c:7:6:analyze_mess	72	static
+../Core/Src/auxiliary_functions.c:39:6:display_text_at_row	40	static
+../Core/Src/auxiliary_functions.c:46:6:show_wifi	16	static
+../Core/Src/auxiliary_functions.c:51:6:update_disp_val	32	static
+../Core/Src/auxiliary_functions.c:58:6:check_alarm	8	static
