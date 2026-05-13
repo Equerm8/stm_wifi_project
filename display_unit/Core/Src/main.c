@@ -30,27 +30,17 @@
 #include "DEV_Config.h"
 #include "LCD_Driver.h"
 #include "LCD_GUI.h"
-#include "fonts.h"
-#include <inttypes.h>
+#include "auxiliary_functions.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 
-typedef struct {
-    uint16_t y_pos;
-    const char* label;
-    uint8_t label_len;
-} DisplayRow;
-
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define MESS_SIZE 64
-#define LETTER_WIDTH 17
-#define FONT_SIZE 24
-#define SCREEN_WIDTH 480
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -89,9 +79,7 @@ int hum;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-void analyze_mess(void);
-void show_wifi(bool state);
-//void update_disp_val(uint32_t value, const DisplayRow row);
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -106,33 +94,33 @@ void show_wifi(bool state);
 int main(void)
 {
 
-  /* USER CODE BEGIN 1 */
+    /* USER CODE BEGIN 1 */
 
-  /* USER CODE END 1 */
+    /* USER CODE END 1 */
 
-  /* MCU Configuration--------------------------------------------------------*/
+    /* MCU Configuration--------------------------------------------------------*/
 
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
+    /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+    HAL_Init();
 
-  /* USER CODE BEGIN Init */
+    /* USER CODE BEGIN Init */
 
-  /* USER CODE END Init */
+    /* USER CODE END Init */
 
-  /* Configure the system clock */
-  SystemClock_Config();
+    /* Configure the system clock */
+    SystemClock_Config();
 
-  /* USER CODE BEGIN SysInit */
+    /* USER CODE BEGIN SysInit */
 
-  /* USER CODE END SysInit */
+    /* USER CODE END SysInit */
 
-  /* Initialize all configured peripherals */
-  MX_GPIO_Init();
-  MX_USART2_UART_Init();
-  MX_SPI1_Init();
-  MX_TIM6_Init();
-  MX_UART4_Init();
-  /* USER CODE BEGIN 2 */
+    /* Initialize all configured peripherals */
+    MX_GPIO_Init();
+    MX_USART2_UART_Init();
+    MX_SPI1_Init();
+    MX_TIM6_Init();
+    MX_UART4_Init();
+    /* USER CODE BEGIN 2 */
     System_Init();
     SysTick_Config(80000000 / 100000); // 0.01 ms
 
@@ -144,27 +132,23 @@ int main(void)
     // gui init
     for (uint8_t i = 0; i < SENSOR_ROWS_LEN; i++)
     {
-
         GUI_DisString_EN(0, sensor_rows[i].y_pos, sensor_rows[i].label, &Font24, WHITE, BLACK);
-
     }
 
 
     __HAL_UART_CLEAR_IT(&huart4, UART_CLEAR_OREF | UART_CLEAR_NEF | UART_CLEAR_FEF | UART_CLEAR_PEF);
     HAL_UART_Receive_IT(&huart4, &rx_byte, 1);
 
-  /* USER CODE END 2 */
+    /* USER CODE END 2 */
 
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
+    /* Infinite loop */
+    /* USER CODE BEGIN WHILE */
     while (1)
     {
 
-    /* USER CODE END WHILE */
+        /* USER CODE END WHILE */
 
-    /* USER CODE BEGIN 3 */
-
-
+        /* USER CODE BEGIN 3 */
         if (analyze_mess_rdy)
         {
             if (wifi_connection == false)
@@ -202,12 +186,9 @@ int main(void)
                 HAL_GPIO_WritePin(BUZZER_GPIO_Port, BUZZER_Pin, 0);
                 buzzer_active = false;
             }
-
         }
-
-
     }
-  /* USER CODE END 3 */
+    /* USER CODE END 3 */
 }
 
 /**
@@ -216,47 +197,47 @@ int main(void)
   */
 void SystemClock_Config(void)
 {
-  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
-  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+    RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+    RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
-  /** Configure the main internal regulator output voltage
-  */
-  if (HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE1) != HAL_OK)
-  {
+    /** Configure the main internal regulator output voltage
+    */
+    if (HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE1) != HAL_OK)
+    {
     Error_Handler();
-  }
+    }
 
-  /** Initializes the RCC Oscillators according to the specified parameters
-  * in the RCC_OscInitTypeDef structure.
-  */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
-  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
-  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
-  RCC_OscInitStruct.PLL.PLLM = 1;
-  RCC_OscInitStruct.PLL.PLLN = 10;
-  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV7;
-  RCC_OscInitStruct.PLL.PLLQ = RCC_PLLQ_DIV2;
-  RCC_OscInitStruct.PLL.PLLR = RCC_PLLR_DIV2;
-  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
-  {
+    /** Initializes the RCC Oscillators according to the specified parameters
+    * in the RCC_OscInitTypeDef structure.
+    */
+    RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+    RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+    RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+    RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+    RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
+    RCC_OscInitStruct.PLL.PLLM = 1;
+    RCC_OscInitStruct.PLL.PLLN = 10;
+    RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV7;
+    RCC_OscInitStruct.PLL.PLLQ = RCC_PLLQ_DIV2;
+    RCC_OscInitStruct.PLL.PLLR = RCC_PLLR_DIV2;
+    if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+    {
     Error_Handler();
-  }
+    }
 
-  /** Initializes the CPU, AHB and APB buses clocks
-  */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+    /** Initializes the CPU, AHB and APB buses clocks
+    */
+    RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
-  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+    RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+    RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+    RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
+    RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_4) != HAL_OK)
-  {
+    if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_4) != HAL_OK)
+    {
     Error_Handler();
-  }
+    }
 }
 
 /* USER CODE BEGIN 4 */
@@ -270,62 +251,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     }
 }
 
-void analyze_mess(void)
-{
-    if (rx_byte == '$')
-    {
-        rx_mess[j + 1] = '\0';
-        // hum external for buzzer
-        int temp;
-        int l_v, l_g;
-        int p;
-        int var_num = sscanf((char*)rx_mess, " T%d|H%d|P%d|L_V%d|L_G%d", &temp, &hum, &p, &l_v, &l_g);
-        uint32_t vars[] = {temp, hum, p, l_v, l_g};
-
-        if (var_num == 5)
-        {
-            char buff[16];
-
-            for (uint8_t i = 1; i < SENSOR_ROWS_LEN; i++)
-            {
-                sprintf(buff, "%" PRIu32 " ", vars[i-1]);
-                int x_temp = (sensor_rows[i].label_len)*LETTER_WIDTH;
-                GUI_DrawRectangle(x_temp, sensor_rows[i].y_pos, SCREEN_WIDTH, sensor_rows[i].y_pos + FONT_SIZE, WHITE, DRAW_FULL, DOT_PIXEL_1X1);
-                GUI_DisString_EN(x_temp, sensor_rows[i].y_pos, buff, &Font24, WHITE, BLACK);
-            }
-
-        }
-        j = -1;
-    }
-    else
-    {
-        if (j == -1 && (rx_byte == '\r' || rx_byte == '\n')) return;
-        if (j < MESS_SIZE - 1)
-        {
-            rx_mess[++j] = rx_byte;
-        }
-    }
-}
-
-void show_wifi(bool state)
-{
-    char buff[4];
-    if (state)
-    {
-        sprintf(buff, "YES");
-    }
-    else
-    {
-        sprintf(buff, "NO!");
-    }
-
-
-    int x_temp = (sensor_rows[0].label_len)*LETTER_WIDTH;
-    GUI_DrawRectangle(x_temp, sensor_rows[0].y_pos, SCREEN_WIDTH, sensor_rows[0].y_pos + FONT_SIZE, WHITE, DRAW_FULL, DOT_PIXEL_1X1);
-    GUI_DisString_EN(x_temp, sensor_rows[0].y_pos, buff, &Font24, WHITE, BLACK);
-}
-
-
 /* USER CODE END 4 */
 
 /**
@@ -334,13 +259,13 @@ void show_wifi(bool state)
   */
 void Error_Handler(void)
 {
-  /* USER CODE BEGIN Error_Handler_Debug */
-  /* User can add his own implementation to report the HAL error return state */
-  __disable_irq();
-  while (1)
-  {
-  }
-  /* USER CODE END Error_Handler_Debug */
+    /* USER CODE BEGIN Error_Handler_Debug */
+    /* User can add his own implementation to report the HAL error return state */
+    __disable_irq();
+    while (1)
+    {
+    }
+    /* USER CODE END Error_Handler_Debug */
 }
 #ifdef USE_FULL_ASSERT
 /**

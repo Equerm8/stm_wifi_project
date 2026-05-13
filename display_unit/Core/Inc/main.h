@@ -31,17 +31,37 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <stdbool.h>
 
+#define MESS_SIZE 64
+#define LETTER_WIDTH 17
+#define FONT_SIZE 24
+#define SCREEN_WIDTH 480
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
-
+typedef struct {
+    uint16_t y_pos;
+    const char* label;
+    uint8_t label_len;
+} DisplayRow;
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
-
+extern const DisplayRow sensor_rows[];
+extern const uint8_t SENSOR_ROWS_LEN;
+extern uint8_t rx_byte;
+extern uint8_t rx_mess[MESS_SIZE];
+extern volatile int16_t j;
+extern bool analyze_mess_rdy;
+extern bool wifi_show_flag;
+extern bool wifi_connection;
+extern bool buzzer_active;
+extern int last_wifi_check;
+extern int last_tick_time;
+extern int hum;
 /* USER CODE END EC */
 
 /* Exported macro ------------------------------------------------------------*/
