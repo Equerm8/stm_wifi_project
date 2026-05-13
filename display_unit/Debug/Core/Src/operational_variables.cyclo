@@ -1,5 +1,0 @@
-../Core/Src/operational_variables.c:9:6:get_wifi_status	1
-../Core/Src/operational_variables.c:16:6:get_temperature	1
-../Core/Src/operational_variables.c:24:6:get_humidity	1
-../Core/Src/operational_variables.c:30:6:get_pressure	1
-../Core/Src/operational_variables.c:36:6:get_light_intensity	1

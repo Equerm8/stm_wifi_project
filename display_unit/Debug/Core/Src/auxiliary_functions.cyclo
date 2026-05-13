@@ -1,2 +1,4 @@
 ../Core/Src/auxiliary_functions.c:7:6:analyze_mess	8
-../Core/Src/auxiliary_functions.c:44:6:show_wifi	2
+../Core/Src/auxiliary_functions.c:38:6:display_text_at_row	1
+../Core/Src/auxiliary_functions.c:45:6:show_wifi	2
+../Core/Src/auxiliary_functions.c:61:6:update_disp_val	1
