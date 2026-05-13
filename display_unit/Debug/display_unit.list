@@ -1994,8 +1994,9 @@ int main(void)
  800156e:	781b      	ldrb	r3, [r3, #0]
  8001570:	4618      	mov	r0, r3
  8001572:	f000 fa2d 	bl	80019d0 <show_wifi>
-
         }
+
+        // hum alarm
         if (hum >= 60)
  8001576:	4b28      	ldr	r3, [pc, #160]	@ (8001618 <main+0x208>)
  8001578:	681b      	ldr	r3, [r3, #0]
