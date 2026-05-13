@@ -30,19 +30,21 @@
 
 /* Create a WiFi access point and provide a web server on it. */
 
+
+// ^ ^ ^ ^ ^
+// | | | | |
+// CODE BASED 0N THIS EXAMPLE
+
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 #include <SoftwareSerial.h>
 
-
-SoftwareSerial mySerial(D5, D6); // RX, TX
-
-
 #ifndef APSSID
 #define APSSID "Etest"
 #define APPSK "thereisnospoon"
 #endif
+SoftwareSerial mySerial(D5, D6); // RX, TX
 
 /* Set these to your desired credentials. */
 const char *ssid = APSSID;
