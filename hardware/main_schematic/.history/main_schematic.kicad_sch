@@ -10,9 +10,164 @@
 		(company "Marcel Siwiela")
 	)
 	(lib_symbols)
+	(circle
+		(center 101.6 63.5)
+		(radius 1.27)
+		(stroke
+			(width 0)
+			(type solid)
+			(color 0 0 255 1)
+		)
+		(fill
+			(type color)
+			(color 0 0 0 0)
+		)
+		(uuid "aa08ce56-86c0-43c2-930f-5623d46bace8")
+	)
+	(arc
+		(start 96.5201 59.6899)
+		(mid 101.6001 57.15)
+		(end 106.68 59.69)
+		(stroke
+			(width 0.381)
+			(type solid)
+		)
+		(fill
+			(type none)
+		)
+		(uuid "b92e9e8a-eebb-4230-b4b7-c3403e729195")
+	)
+	(arc
+		(start 97.79 60.96)
+		(mid 101.6 58.9209)
+		(end 105.4101 60.96)
+		(stroke
+			(width 0.381)
+			(type solid)
+		)
+		(fill
+			(type none)
+		)
+		(uuid "bbda9482-82d1-4ea3-aff1-e9d23a6b2114")
+	)
+	(arc
+		(start 99.06 62.23)
+		(mid 101.6 60.6602)
+		(end 104.14 62.23)
+		(stroke
+			(width 0.381)
+			(type solid)
+		)
+		(fill
+			(type none)
+		)
+		(uuid "ff04829a-0baa-4ad9-9f33-25d00b33b4e1")
+	)
+	(text "WiFi\n"
+		(exclude_from_sim no)
+		(at 101.346 68.072 0)
+		(effects
+			(font
+				(size 2.54 2.54)
+				(thickness 0.508)
+				(bold yes)
+			)
+		)
+		(uuid "db980f0a-a4bb-433e-8470-fae7667881d4")
+	)
+	(polyline
+		(pts
+			(xy 96.52 62.23) (xy 97.79 63.5)
+		)
+		(stroke
+			(width 0.254)
+			(type dash)
+		)
+		(uuid "1a36d4cf-dc5e-4cc2-8c05-a680215dc2c5")
+	)
+	(polyline
+		(pts
+			(xy 120.65 66.04) (xy 121.92 64.77)
+		)
+		(stroke
+			(width 0.254)
+			(type solid)
+		)
+		(uuid "24410280-75fc-48e8-b50c-7a261801bf67")
+	)
+	(polyline
+		(pts
+			(xy 105.41 63.5) (xy 106.68 62.23)
+		)
+		(stroke
+			(width 0.254)
+			(type solid)
+		)
+		(uuid "4ff9df7d-4f89-4fbb-9326-d93fba211d4b")
+	)
+	(polyline
+		(pts
+			(xy 87.63 60.96) (xy 92.71 66.04)
+		)
+		(stroke
+			(width 0.254)
+			(type dash)
+		)
+		(uuid "78136ade-28fa-4a75-a68b-0655bd5e7c99")
+	)
+	(polyline
+		(pts
+			(xy 92.71 66.04) (xy 96.52 62.23)
+		)
+		(stroke
+			(width 0.254)
+			(type dash)
+		)
+		(uuid "7eac4020-336e-4c53-80fd-440eca727748")
+	)
+	(polyline
+		(pts
+			(xy 115.57 60.96) (xy 120.65 66.04)
+		)
+		(stroke
+			(width 0.254)
+			(type dash)
+		)
+		(uuid "97f05496-9963-4a56-b537-1f5925aa4327")
+	)
+	(polyline
+		(pts
+			(xy 110.49 66.04) (xy 115.57 60.96)
+		)
+		(stroke
+			(width 0.254)
+			(type dash)
+		)
+		(uuid "a31a8791-7ff1-40ff-864a-14fac52e32d5")
+	)
+	(polyline
+		(pts
+			(xy 106.68 62.23) (xy 110.49 66.04)
+		)
+		(stroke
+			(width 0.254)
+			(type dash)
+		)
+		(uuid "a4e263ce-2584-44d0-9450-84ff21dccd21")
+	)
+	(polyline
+		(pts
+			(xy 82.55 66.04) (xy 87.63 60.96)
+		)
+		(stroke
+			(width 0.254)
+			(type dash)
+		)
+		(uuid "a71d2389-da16-4ac7-9173-17179d1f6136")
+	)
 	(sheet
-		(at 110.49 60.96)
-		(size 30.48 25.4)
+		(at 121.92 54.61)
+		(size 20.32 17.78)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
@@ -27,7 +182,7 @@
 		)
 		(uuid "82ff7c77-b2ba-4d06-a57f-3cb8d2a60299")
 		(property "Sheetname" "Display unit"
-			(at 110.49 60.2484 0)
+			(at 121.92 53.8984 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -38,7 +193,7 @@
 			)
 		)
 		(property "Sheetfile" "display-unit.kicad_sch"
-			(at 110.49 86.9446 0)
+			(at 121.92 72.9746 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -57,8 +212,8 @@
 		)
 	)
 	(sheet
-		(at 49.53 62.23)
-		(size 30.48 25.4)
+		(at 62.23 54.61)
+		(size 20.32 17.78)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
@@ -73,7 +228,7 @@
 		)
 		(uuid "beb408b9-6b1c-49f2-81ae-487de1cad739")
 		(property "Sheetname" "Sensor based MCU"
-			(at 49.53 61.5184 0)
+			(at 62.23 53.8984 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -84,7 +239,7 @@
 			)
 		)
 		(property "Sheetfile" "sensor-based-mcu.kicad_sch"
-			(at 49.53 88.2146 0)
+			(at 62.23 72.9746 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
