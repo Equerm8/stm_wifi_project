@@ -53,7 +53,6 @@
 /* USER CODE BEGIN PV */
 
 volatile uint32_t led_ticks;
-volatile bool is_usr_btn_pressed;
 uint8_t btn_pressed_msg[]="Button pressed!";
 DHT11_t DHT11 = {.GPIOx = DHT_control_GPIO_Port, .GPIO_Pin = DHT_control_Pin, .htim = &htim6};
 
@@ -158,12 +157,6 @@ int main(void)
                 HAL_UART_Transmit(&huart2, (uint8_t*)"BH1750 [VCC&GND] Error!\r", 15, 100);
             }
         }
-
-        if (is_usr_btn_pressed)
-        {
-          HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
-          is_usr_btn_pressed = false;
-        }
     }
     /* USER CODE END 3 */
 }
@@ -209,13 +202,6 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin)
-{
-	if (GPIO_Pin == USR_BTN_Pin)
-	{
-		is_usr_btn_pressed = true;
-	}
-}
 void delay (uint16_t time)
 {
 	/* change your code here for the delay in microseconds */
@@ -224,8 +210,6 @@ void delay (uint16_t time)
 	while ((__HAL_TIM_GET_COUNTER(&htim6))<time);
 	__HAL_TIM_DISABLE(&htim6);
 }
-
-
 /* USER CODE END 4 */
 
 /**

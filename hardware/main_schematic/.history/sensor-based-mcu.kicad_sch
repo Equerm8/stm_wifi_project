@@ -4314,7 +4314,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "ZC362800_"
+		(property "Value" "BH1750"
 			(at 162.56 120.6499 0)
 			(show_name no)
 			(do_not_autoplace no)
